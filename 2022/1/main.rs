@@ -1,5 +1,6 @@
 // Advent of Code Day 1
 
+use std::collections::BinaryHeap;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -47,13 +48,13 @@ impl ElfLedger {
 fn main() {
     let ledger = ElfLedger::from_file("input.txt").expect("Error parsing file");
 
-    let mut max_cals: u64 = 0;
+    // BinaryHeap is by default a max heap
+    let mut cals: BinaryHeap<u64> = BinaryHeap::new();
     for elf in ledger.elves {
-        let cals = elf.calories.iter().sum();
-        if cals > max_cals {
-            max_cals = cals;
-        }
+        cals.push(elf.calories.iter().sum());
     }
 
-    println!("Max cals: {}", max_cals);
+    println!("Max cals: {}", cals.peek().unwrap());
+    let top3: u64 = cals.pop().unwrap() + cals.pop().unwrap() + cals.pop().unwrap();
+    println!("Sum of top 3 cals: {}", top3);
 }
