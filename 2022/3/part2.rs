@@ -4,13 +4,13 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-fn prioritize_item(item: &char) -> u32 {
-    if *item >= 'a' && *item <= 'z' {
+fn prioritize_item(item: char) -> u32 {
+    if item >= 'a' && item <= 'z' {
         // a-z have priorities 1-26
-        (*item as u8 - b'a' + 1) as u32
-    } else if *item >= 'A' && *item <= 'Z' {
+        (item as u8 - b'a' + 1) as u32
+    } else if item >= 'A' && item <= 'Z' {
         // A-Z have priorities 27-52
-        (*item as u8 - b'A' + 27) as u32
+        (item as u8 - b'A' + 27) as u32
     } else {
         panic!("Invalid item in input: {}", item)
     }
@@ -48,7 +48,7 @@ fn main() {
 
         // Assert there's only one badge
         assert!(common_items.len() == 1);
-        let badge = common_items.iter().collect::<Vec<&char>>()[0];
+        let badge = common_items.into_iter().collect::<Vec<char>>()[0];
 
         priority_sum += prioritize_item(badge);
     }
