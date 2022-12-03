@@ -41,12 +41,9 @@ fn main() {
         let elf2_items: HashSet<char> = line2.trim().chars().collect();
         let elf3_items: HashSet<char> = line3.trim().chars().collect();
 
-        // TODO this is extremely ugly, and the weird usage of references here
-        // is the result of wrestling with the borrow checker instead of
-        // understanding why exactly it is that BitAnd expects a reference to
-        // HashSets and such. The fact that this is so much messier than the
-        // two way intersection code is a pain; want to come back and see how
-        // this can be cleaned up
+        // HashSet BitAnd takes references to HashSets and returns a new
+        // HashSet, which means we need to wrap the first returned value
+        // in a reference instead of just chaining bitwise ands.
         let common_items = &(&elf1_items & &elf2_items) & &elf3_items;
 
         // Assert there's only one badge
