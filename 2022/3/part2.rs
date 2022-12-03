@@ -47,7 +47,7 @@ fn main() {
         // HashSets and such. The fact that this is so much messier than the
         // two way intersection code is a pain; want to come back and see how
         // this can be cleaned up
-        let common_items: HashSet<char> = &(&elf1_items & &elf2_items) & &elf3_items;
+        let common_items = &(&elf1_items & &elf2_items) & &elf3_items;
 
         // Assert there's only one badge
         assert!(common_items.len() == 1);
