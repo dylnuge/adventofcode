@@ -86,6 +86,7 @@ fn main() {
         }
     }
 
+    /* Part 1 solution
     let mut size: usize = 0;
     for node in &fs.nodes {
         if let (_, fs_util::FsEntry::Directory(dir_entry)) = node {
@@ -94,7 +95,31 @@ fn main() {
                 size += dir_size;
             }
         }
+    } */
+
+    // Part 2 solution
+    let total_space: usize = 70000000;
+    let needed_space: usize = 30000000;
+    let used_space: usize = fs.get_dir_size(fs.get_root());
+    let avail_space: usize = total_space - used_space;
+    let min_del: usize = needed_space - avail_space;
+
+    let mut smallest_found: Option<usize> = None;
+    for node in &fs.nodes {
+        if let (_, fs_util::FsEntry::Directory(dir_entry)) = node {
+            let dir_size = fs.get_dir_size(&dir_entry);
+            if dir_size >= min_del {
+                match smallest_found {
+                    None => smallest_found = Some(dir_size),
+                    Some(smallest) => {
+                        if dir_size < smallest {
+                            smallest_found = Some(dir_size);
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    println!("Size: {}", size);
+    println!("Size: {}", smallest_found.unwrap());
 }

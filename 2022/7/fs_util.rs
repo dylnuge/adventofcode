@@ -125,6 +125,14 @@ impl FileSystem {
 
         size
     }
+
+    pub fn get_root(&self) -> &DirectoryEntry {
+        let root_node = self.nodes.get("/").unwrap();
+        match root_node {
+            FsEntry::Directory(dir_entry) => dir_entry,
+            FsEntry::File(_) => panic!("Bad root!"),
+        }
+    }
 }
 
 // Initalization function for our file system; creates a FileSystem with an
