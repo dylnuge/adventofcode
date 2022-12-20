@@ -1,4 +1,4 @@
-// Advent of Code 2022 Day 8
+// Advent of Code 2022 Day 8 Part 1
 
 use std::fs;
 
