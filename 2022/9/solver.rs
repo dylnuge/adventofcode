@@ -3,47 +3,49 @@
 use std::collections::HashSet;
 use std::fs;
 
-// as an invarient, the tail can be assumed to never be more than two squares
-// away from the head
-fn move_tail(head_x: i32, head_y: i32, tail_x: i32, tail_y: i32) -> (i32, i32) {
-    let x_dist = (tail_x - head_x).abs();
-    let y_dist = (tail_y - head_y).abs();
+// Move knot2 towards knot1 based on the movement rules
+fn move_knot(knot1_pos: (i32, i32), knot2_pos: (i32, i32)) -> (i32, i32) {
+    let (knot1_x, knot1_y) = knot1_pos;
+    let (knot2_x, knot2_y) = knot2_pos;
+
+    let x_dist = (knot2_x - knot1_x).abs();
+    let y_dist = (knot2_y - knot1_y).abs();
     if x_dist <= 1 && y_dist <= 1 {
-        // Tail is within 1 square of head (including on top of it), doesn't
+        // knot2 is within 1 square of knot1 (including on top of it), doesn't
         // move
-        return (tail_x, tail_y);
+        return (knot2_x, knot2_y);
     }
 
-    // Move a square left or right towards the head
-    let new_x = if tail_x < head_x {
-        tail_x + 1
-    } else if tail_x > head_x {
-        tail_x - 1
+    // Move a square left or right towards the knot1
+    let new_x = if knot2_x < knot1_x {
+        knot2_x + 1
+    } else if knot2_x > knot1_x {
+        knot2_x - 1
     } else {
-        tail_x
+        knot2_x
     };
 
-    // Move a square up or down towards the head
-    let new_y = if tail_y < head_y {
-        tail_y + 1
-    } else if tail_y > head_y {
-        tail_y - 1
+    // Move a square up or down towards the knot1
+    let new_y = if knot2_y < knot1_y {
+        knot2_y + 1
+    } else if knot2_y > knot1_y {
+        knot2_y - 1
     } else {
-        tail_y
+        knot2_y
     };
 
     return (new_x, new_y);
 }
 
 fn main() {
-    // Initialization: head and tail start on top of each other at the origin
-    // (0,0), and the tail has visited that point
-    let mut head_x = 0i32;
-    let mut head_y = 0i32;
-    let mut tail_x = 0i32;
-    let mut tail_y = 0i32;
+    // Initialization: all knots start on top of each other at the origin (0,0),
+    // and the tail has visited that point. To solve Part 1 instead of Part 2
+    // with this code, all that needs to change is the size of the vec (from 10
+    // to 2).
+    let mut knots = vec![(0i32, 0i32); 10];
+    let tail_idx = knots.len() - 1;
     let mut tail_visited: HashSet<(i32, i32)> = HashSet::new();
-    tail_visited.insert((tail_x, tail_y));
+    tail_visited.insert(knots[tail_idx]);
 
     let data: String = fs::read_to_string("input.txt").unwrap();
     for line in data.lines() {
@@ -52,6 +54,8 @@ fn main() {
         let steps = elems.next().unwrap().parse::<u32>().unwrap();
 
         for _ in 0..steps {
+            // Move the head knot
+            let (mut head_x, mut head_y) = knots[0];
             match direction {
                 "D" => head_y -= 1,
                 "U" => head_y += 1,
@@ -59,10 +63,13 @@ fn main() {
                 "R" => head_x += 1,
                 _ => panic!("bad direction: {}", direction),
             }
-            let (new_x, new_y) = move_tail(head_x, head_y, tail_x, tail_y);
-            tail_x = new_x;
-            tail_y = new_y;
-            tail_visited.insert((tail_x, tail_y));
+            knots[0] = (head_x, head_y);
+
+            // Move the remaining knots
+            for knot in 1..knots.len() {
+                knots[knot] = move_knot(knots[knot - 1], knots[knot])
+            }
+            tail_visited.insert(knots[tail_idx]);
         }
     }
     println!("tail visited {} locations", tail_visited.len());
