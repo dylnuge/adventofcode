@@ -117,7 +117,7 @@ fn get_monkeys_from_file(filename: &str) -> Vec<Monkey> {
     monkeys
 }
 
-fn process_item(start_val: usize, operation: &Operation) -> usize {
+fn process_item(start_val: usize, operation: &Operation, div_factor: usize) -> usize {
     let mut end_val: usize = start_val;
     // Perform the operation on the item
     match operation {
@@ -129,12 +129,16 @@ fn process_item(start_val: usize, operation: &Operation) -> usize {
 
     // Take the floor of dividing by 3, which in Rust is just the result of
     // doing integer division on usizes
-    end_val = end_val / 3;
+    // Uncomment this for Part 1
+    // end_val = end_val / 3;
 
-    end_val
+    // This keeps us from overflowing with multiplications; we only care about
+    // divisibility, and div_factor is all the monkey's div factors multiplied
+    // together
+    end_val % div_factor
 }
 
-fn process_round(monkeys: &mut Vec<Monkey>) -> () {
+fn process_round(monkeys: &mut Vec<Monkey>, div_factor: usize) -> () {
     // Use a range here so we can do some tricks with borrowing. The issue here
     // is that nothing in our code guarentees that a monkey never throws to
     // itself, so naively pushing into the true/false monkey's item stack
@@ -148,7 +152,7 @@ fn process_round(monkeys: &mut Vec<Monkey>) -> () {
             let operation = &monkey.operation;
             while items.len() != 0 {
                 let item = items.pop_front().unwrap();
-                let new_item = process_item(item, operation);
+                let new_item = process_item(item, operation, div_factor);
 
                 if new_item % monkey.test_divisor == 0 {
                     true_items.push_back(new_item);
@@ -173,8 +177,14 @@ fn process_round(monkeys: &mut Vec<Monkey>) -> () {
 fn main() {
     let mut monkeys: Vec<Monkey> = get_monkeys_from_file("input.txt");
 
-    for _ in 0..20 {
-        process_round(&mut monkeys);
+    let mut div_factor = 1usize;
+    for monkey in &monkeys {
+        div_factor *= monkey.test_divisor;
+    }
+
+    // Go 10K rounds. For Part 1, use 20 here instead.
+    for _ in 0..10000 {
+        process_round(&mut monkeys, div_factor);
     }
 
     // Multiply the two largest inspection counts
